@@ -1,9 +1,21 @@
 
+import { db } from '../db';
+import { expenseTransactionsTable } from '../db/schema';
 import { type ExpenseTransaction } from '../schema';
 
-export async function getExpenseTransactions(): Promise<ExpenseTransaction[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all expense transactions with their
-  // associated accounts, suppliers, and related journal entries.
-  return [];
-}
+export const getExpenseTransactions = async (): Promise<ExpenseTransaction[]> => {
+  try {
+    const results = await db.select()
+      .from(expenseTransactionsTable)
+      .execute();
+
+    // Convert numeric fields back to numbers before returning
+    return results.map(expense => ({
+      ...expense,
+      amount: parseFloat(expense.amount)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch expense transactions:', error);
+    throw error;
+  }
+};

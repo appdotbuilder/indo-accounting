@@ -1,9 +1,21 @@
 
+import { db } from '../db';
+import { suppliersTable } from '../db/schema';
 import { type Supplier } from '../schema';
 
-export async function getSuppliers(): Promise<Supplier[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all suppliers from the database
-  // with proper pagination and search capabilities.
-  return [];
-}
+export const getSuppliers = async (): Promise<Supplier[]> => {
+  try {
+    const results = await db.select()
+      .from(suppliersTable)
+      .orderBy(suppliersTable.name)
+      .execute();
+
+    return results.map(supplier => ({
+      ...supplier,
+      // No numeric conversions needed - all fields are text, integer, or timestamp
+    }));
+  } catch (error) {
+    console.error('Failed to fetch suppliers:', error);
+    throw error;
+  }
+};

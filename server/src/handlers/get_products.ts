@@ -1,9 +1,22 @@
 
+import { db } from '../db';
+import { productsTable } from '../db/schema';
 import { type Product } from '../schema';
 
-export async function getProducts(): Promise<Product[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all products/inventory items
-  // with stock levels and low stock alerts.
-  return [];
-}
+export const getProducts = async (): Promise<Product[]> => {
+  try {
+    const results = await db.select()
+      .from(productsTable)
+      .execute();
+
+    // Convert numeric fields back to numbers
+    return results.map(product => ({
+      ...product,
+      unit_price: parseFloat(product.unit_price),
+      cost_price: parseFloat(product.cost_price)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    throw error;
+  }
+};
